@@ -1,0 +1,4 @@
+# Ignoring the enviroment file
+.venv/
+
+# Ignoring the 
