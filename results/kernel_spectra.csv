@@ -1,0 +1,9 @@
+experiment,target,representation,model,encoding,n_uploads,n_qubits,n_layers,n_params,n_train,rotation_id,polar_angle,seed,stepsize,train_acc,test_acc,balanced_acc,majority,ceiling,final_loss,wall_time
+kernel-spectrum,,,bloch,,,1,,4,,,,,,,0.5004430171682333,,,,,
+kernel-spectrum,,,cartesian,,,1,,3,,,,,,,0.3532515402386867,,,,,
+kernel-spectrum,,,sincos (torus),,,1,,4,,,,,,,0.6789138331445026,,,,,
+kernel-spectrum,,,amplitude (RP^2),,,1,,6,,,,,,,0.33431623263307986,,,,,
+kernel-spectrum-spin,,,spin_n1,,,1,,4,,,,,,,0.5004430171682333,,,,,
+kernel-spectrum-spin,,,spin_n2,,,2,,9,,,,,,,0.33411035092135155,,,,,
+kernel-spectrum-spin,,,spin_n3,,,3,,16,,,,,,,0.25111075378223624,,,,,
+kernel-spectrum-spin,,,spin_n4,,,4,,25,,,,,,,0.20143243301117916,,,,,
