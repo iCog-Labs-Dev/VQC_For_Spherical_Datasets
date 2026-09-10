@@ -69,6 +69,13 @@ def affine_ceiling(theta, phi, labels, n_directions=4096, balanced=False, chunk=
     inequality are tried, so the search covers every spherical cap.
     Vectorised over directions in chunks.
 
+    The direction grid is finite, so the returned accuracy is a LOWER bound on
+    the true ceiling: the best available direction can sit half a grid spacing
+    off the optimum, which costs roughly a point of accuracy at 1024 directions
+    on a sharply defined cap.  Use a fine grid for reported numbers, and read a
+    measured accuracy marginally above a coarse-grid ceiling as a resolution
+    artefact rather than a falsification.
+
     Returns a dict with accuracy, direction, threshold and majority_baseline.
     The majority baseline is returned alongside deliberately: on an unbalanced
     target, "the model scored 58%" and "the model predicts one class for
