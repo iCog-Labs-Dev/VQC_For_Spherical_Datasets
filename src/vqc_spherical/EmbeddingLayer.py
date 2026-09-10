@@ -19,6 +19,7 @@ class EmbeddingLayer:
     SUPPORTED_METHOD = ["spherical"]
 
     def __init__(self, method="spherical", rotation="Y"):
+        self.method = str(method).lower()
         self.rotation = rotation
 
         if self.method not in EmbeddingLayer.SUPPORTED_METHOD:
