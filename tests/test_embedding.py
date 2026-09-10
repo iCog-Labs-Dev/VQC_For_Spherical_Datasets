@@ -71,3 +71,22 @@ def test_fidelity_matches_bloch_kernel(theta, phi):
     t2, p2 = 1.9, 0.4
     fidelity = np.abs(np.vdot(circuit_state(theta, phi), circuit_state(t2, p2))) ** 2
     assert fidelity == pytest.approx(K.bloch_kernel(theta, phi, t2, p2), abs=1e-12)
+
+
+@pytest.mark.parametrize("n", [1, 2, 3])
+@pytest.mark.parametrize("theta,phi", POINTS[:2])
+def test_broadcast_fidelity_matches_spin_kernel(n, theta, phi):
+    """
+    The n-qubit broadcast state has fidelity cos^{2n}(gamma/2) -- still a
+    function of geodesic distance alone, so the spin ladder stays faithful at
+    every rung while its harmonic degree grows.
+    """
+    t2, p2 = 1.9, 0.4
+    f = np.abs(np.vdot(circuit_state(theta, phi, n, "broadcast"),
+                       circuit_state(t2, p2, n, "broadcast"))) ** 2
+    assert f == pytest.approx(K.bloch_kernel_spin(theta, phi, t2, p2, n=n), abs=1e-12)
+
+
+def test_broadcast_rejects_unknown_method():
+    with pytest.raises(ValueError, match="Unsupported embedding method"):
+        EmbeddingLayer("angle")
