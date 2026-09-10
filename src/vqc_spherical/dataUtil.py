@@ -101,3 +101,99 @@ def sphere_to_cartesian(theta, phi):
 
 if __name__ == "__main__":
     print(water_earth_dataset())
+
+
+# ======================================================================
+# Falsification targets and corrected generators
+# ======================================================================
+
+def _uniform_sphere(n, rng):
+    """
+    Uniform on S^2: z uniform in [-1, 1].
+
+    Sampling theta uniformly instead would concentrate points at the poles and
+    quietly change every ceiling computed from the result.
+    """
+    z = rng.uniform(-1, 1, n)
+    return np.arccos(z), rng.uniform(0, 2 * np.pi, n), z
+
+
+def make_latitude_bands(n_samples=400, noise_std=0.08, seed=42,
+                        latitude_center=np.pi / 3, separation=np.pi / 3):
+    """
+    The corrected degree-1 task: two latitude bands with FULL longitude
+    coverage for both classes, so nothing about the label is readable from phi.
+
+    This is the axis-aligned control -- theta alone suffices by design, which
+    is the intent, not a fault.  For a task that genuinely needs both
+    coordinates use make_tilted_bands.
+    """
+    rng = np.random.default_rng(seed)
+    n_half = n_samples // 2
+    theta_0 = rng.normal(latitude_center, noise_std * np.pi, n_half)
+    theta_1 = rng.normal(latitude_center + separation, noise_std * np.pi,
+                         n_samples - n_half)
+    theta = np.clip(np.concatenate([theta_0, theta_1]), 0, np.pi)
+    phi = rng.uniform(0, 2 * np.pi, n_samples)
+    labels = np.concatenate([np.zeros(n_half), np.ones(n_samples - n_half)])
+    return theta, phi, labels
+
+
+def make_quadrupole(n_samples=400, noise_std=0.05, seed=42):
+    """
+    Label = sign(3 cos^2(theta) - 1): positive near both poles, negative around
+    the equator.  The boundary is the nodal set of the pure degree-2 harmonic.
+
+    A single-upload model provably cannot express it: f = alpha + beta.r has no
+    z^2 term for any (alpha, beta), so its decision region is ONE spherical cap
+    and this target needs two.
+
+    The class balance is 42/58, not 50/50 -- the label is positive iff
+    |z| > 1/sqrt(3) ~ 0.577.  Report the majority baseline beside the accuracy,
+    and prefer balanced accuracy.
+    """
+    rng = np.random.default_rng(seed)
+    theta, phi, z = _uniform_sphere(n_samples, rng)
+    signal = (3 * z ** 2 - 1) + rng.normal(0, noise_std, n_samples)
+    return theta, phi, (signal > 0).astype(float)
+
+
+def make_sectoral(n_samples=400, noise_std=0.05, seed=42):
+    """
+    Label = sign(cos 2 phi): four alternating longitude sectors, the m = +-2
+    companion to the quadrupole.  Exactly balanced, which makes it a cleaner
+    falsification instrument.
+
+    Do NOT assume its affine ceiling is 0.5: a cap of angular radius 45 degrees
+    centred on the equator sits entirely inside one sector and already scores
+    about 0.65.  Compute the ceiling; never guess it.
+    """
+    rng = np.random.default_rng(seed)
+    theta, phi, _ = _uniform_sphere(n_samples, rng)
+    signal = np.cos(2 * phi) + rng.normal(0, noise_std, n_samples)
+    return theta, phi, (signal > 0).astype(float)
+
+
+def make_banded_target(n_samples=400, degree=4, seed=42):
+    """Alternating latitude bands -- a degree-`degree` target, for the ladder."""
+    rng = np.random.default_rng(seed)
+    theta, phi, _ = _uniform_sphere(n_samples, rng)
+    return theta, phi, (np.cos(degree * theta) > 0).astype(float)
+
+
+def make_hyperbolic(n_samples=400, noise_std=0.05, seed=42):
+    """
+    Label = sign(x * z): positive where x and z share a sign.  This is the real
+    product structure -- BOTH coordinate marginals sit at chance, so no single
+    threshold on theta or phi carries any information at all.
+
+    x*z = sin(theta) cos(theta) cos(phi) is proportional to the degree-2
+    harmonic Y_21, so the price of that property is exactly what the theory
+    predicts: a single-upload model cannot express it at any depth.  It is a
+    falsification target, not a task the circuit is expected to solve.
+    """
+    rng = np.random.default_rng(seed)
+    theta, phi, _ = _uniform_sphere(n_samples, rng)
+    x = np.sin(theta) * np.cos(phi)
+    z = np.cos(theta)
+    return theta, phi, ((x * z + rng.normal(0, noise_std, n_samples)) > 0).astype(float)
