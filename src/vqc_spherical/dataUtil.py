@@ -3,7 +3,6 @@ Data preparation and cleaning for spherical datasets. we generate sphere_moons d
 adpoted the water-earth classfication datatset, as another real datasets to experiments with.
 """
 
-import ee
 import numpy as np
 
 def make_sphere_moons(n_samples=300, noise_std=0.08, seed=42):
@@ -49,9 +48,13 @@ def make_sphere_moons(n_samples=300, noise_std=0.08, seed=42):
 
 def water_earth_dataset():
     """
-    
-    Fetches the water-earth classification dataset from Google Earth Engine.
-    The dataset is a binary classification of water vs. land on the Earth's surface."""
+    Fetch the water/land classification dataset from Google Earth Engine.
+
+    `earthengine-api` is imported lazily and Initialize() is called here rather
+    than at module scope, so importing this module never contacts a network
+    service and never requires Earth Engine credentials.
+    """
+    import ee
 
     # Remember that you need to authenticate with Google Earth Engine before running this function
 
@@ -68,5 +71,5 @@ def sphere_to_cartesian(theta, phi):
     return np.column_stack([x, y, z])
 
 
-data = water_earth_dataset()
-print(data)
+if __name__ == "__main__":
+    print(water_earth_dataset())
