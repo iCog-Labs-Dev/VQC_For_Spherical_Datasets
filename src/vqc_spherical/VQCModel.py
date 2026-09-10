@@ -1,8 +1,12 @@
 import pennylane as qml
 from pennylane import numpy as np
 
-from AnsatzLayer import AnsatzLayer
-from EmbeddingLayer import EmbeddingLayer
+try:  # works both as a package import and as a flat script directory
+    from .AnsatzLayer import AnsatzLayer
+    from .EmbeddingLayer import EmbeddingLayer
+except ImportError:  # pragma: no cover - flat sys.path
+    from AnsatzLayer import AnsatzLayer
+    from EmbeddingLayer import EmbeddingLayer
 
 
 
