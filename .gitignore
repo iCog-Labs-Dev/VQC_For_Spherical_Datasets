@@ -1,5 +1,14 @@
-# Ignoring the enviroment file
+# Virtual environments
 .venv/
+venv/
+
+# Python bytecode and caches
+__pycache__/
 src/vqc_spherical/__pycache__/
-tests/
-# Ignoring the 
+*.py[cod]
+.pytest_cache/
+
+# OS and editor noise
+.DS_Store
+.idea/
+.vscode/
