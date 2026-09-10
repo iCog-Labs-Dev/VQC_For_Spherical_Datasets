@@ -48,22 +48,21 @@ class AnsatzLayer:
                 kwargs["rotations"] = [self.rotation] * len(wires)
             qml.RandomLayers(**kwargs)
 
-
-        def get_weight_shape(self, n_qubits):
-            """
-            Dynamically calculates the exact tensor shape required for the weights
-            so you never get a matrix mismatch error during initialization.
-            """
-            
-            if self.method == "basic":
-                return qml.BasicEntanglerLayers.shape(
-                    n_layers=self.n_layers, n_wires=n_qubits
-                )
-            elif self.method == "strong":
-                return qml.StronglyEntanglingLayers.shape(
-                    n_layers=self.n_layers, n_wires=n_qubits
-                )
-            elif self.method == "random":
-                return qml.RandomLayers.shape(
-                    n_layers=self.n_layers, n_rotations=n_qubits
-                )
+    def get_weight_shape(self, n_qubits):
+        """
+        Dynamically calculates the exact tensor shape required for the weights
+        so you never get a matrix mismatch error during initialization.
+        """
+        
+        if self.method == "basic":
+            return qml.BasicEntanglerLayers.shape(
+                n_layers=self.n_layers, n_wires=n_qubits
+            )
+        elif self.method == "strong":
+            return qml.StronglyEntanglingLayers.shape(
+                n_layers=self.n_layers, n_wires=n_qubits
+            )
+        elif self.method == "random":
+            return qml.RandomLayers.shape(
+                n_layers=self.n_layers, n_rotations=n_qubits
+            )
