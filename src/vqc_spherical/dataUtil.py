@@ -197,3 +197,155 @@ def make_hyperbolic(n_samples=400, noise_std=0.05, seed=42):
     x = np.sin(theta) * np.cos(phi)
     z = np.cos(theta)
     return theta, phi, ((x * z + rng.normal(0, noise_std, n_samples)) > 0).astype(float)
+
+
+# ======================================================================
+# Rigid rotations -- the faithfulness instrument
+# ======================================================================
+
+def cartesian_to_sphere(xyz):
+    """Inverse of sphere_to_cartesian; theta in [0, pi], phi in [0, 2pi)."""
+    xyz = np.asarray(xyz, dtype=float)
+    x, y, z = xyz[:, 0], xyz[:, 1], xyz[:, 2]
+    return np.arccos(np.clip(z, -1, 1)), np.mod(np.arctan2(y, x), 2 * np.pi)
+
+
+def rotation_y(angle):
+    """Rotation about the y axis -- tilts the cut away from the latitudes."""
+    c, s = np.cos(angle), np.sin(angle)
+    return np.array([[c, 0, s], [0, 1, 0], [-s, 0, c]])
+
+
+def rotation_z(angle):
+    """Rotation about the z axis -- rotates the frame in longitude."""
+    c, s = np.cos(angle), np.sin(angle)
+    return np.array([[c, -s, 0], [s, c, 0], [0, 0, 1]])
+
+
+def random_rotation(seed=0):
+    """Haar-random element of SO(3), via QR with a determinant fix."""
+    rng = np.random.default_rng(seed)
+    Q, R = np.linalg.qr(rng.normal(size=(3, 3)))
+    Q = Q * np.sign(np.diag(R))
+    if np.linalg.det(Q) < 0:
+        Q[:, 0] *= -1
+    return Q
+
+
+def rotate_dataset(theta, phi, R):
+    """
+    Conjugate a dataset by R in SO(3) and re-express it in (theta, phi).
+
+    Every geodesic distance is preserved exactly, so the task -- its difficulty,
+    its class balance, its affine ceiling -- is unchanged and only the
+    coordinate description differs.  Any variation in accuracy across
+    placements is therefore purely representational, which is what makes this
+    a measurement of faithfulness rather than of difficulty.
+    """
+    return cartesian_to_sphere(sphere_to_cartesian(theta, phi) @ np.asarray(R).T)
+
+
+def make_tilted_bands(n_samples=400, noise_std=0.07, seed=42,
+                      separation=np.pi / 6, tilt=np.pi / 4, twist=np.pi / 3):
+    """
+    Two latitude bands, rigidly rotated so the separating circle is not a line
+    of latitude.  The boundary becomes
+
+        sin(tilt) sin(theta) cos(phi - twist) + cos(tilt) cos(theta) = c
+
+    so neither coordinate alone determines the label, while the task itself is
+    unchanged -- rotation preserves every geodesic distance.
+
+    tilt = 0 reproduces make_latitude_bands (theta alone suffices).
+    tilt = pi/2 puts the cut through the poles and PHI alone suffices: the leak
+    moves rather than disappearing.  Intermediate tilts near pi/4 are where
+    both coordinates are genuinely required.  Verify with
+    Analysis.coordinate_leakage rather than assuming.
+
+    Note what this means for the model: the task is still exactly degree 1, so
+    a single-upload circuit can solve it.  A task needing both coordinates in
+    EVERY frame is necessarily degree >= 2 and provably out of reach -- that is
+    make_hyperbolic, and the trade is the restriction result stated as a
+    property of datasets.
+    """
+    theta, phi, labels = make_latitude_bands(
+        n_samples=n_samples, noise_std=noise_std, seed=seed,
+        latitude_center=np.pi / 2 - separation / 2, separation=separation)
+    theta, phi = rotate_dataset(theta, phi, rotation_z(twist) @ rotation_y(tilt))
+    return theta, phi, labels
+
+
+# ======================================================================
+# Registry
+# ======================================================================
+#
+# Every generator is reachable through TARGETS with the SAME signature,
+# make(n_samples, seed, **kw), so experiment code can loop over datasets
+# without special-casing any of them.
+
+def _banded(n_samples=400, seed=42, degree=4, **kw):
+    return make_banded_target(n_samples=n_samples, degree=degree, seed=seed)
+
+
+TARGETS = {
+    "sphere_moons": make_sphere_moons,
+    "latitude_bands": make_latitude_bands,
+    "tilted_bands": make_tilted_bands,
+    "quadrupole": make_quadrupole,
+    "sectoral": make_sectoral,
+    "banded_4": _banded,
+    "hyperbolic": make_hyperbolic,
+}
+
+# role:
+#   "baseline"      degree <= 1, solvable, axis-aligned -- the control
+#   "primary"       degree <= 1, solvable, needs both coordinates
+#   "falsification" degree > 1, provably out of reach at one upload
+#   "deprecated"    retained for reproducibility only
+TARGET_META = {
+    "sphere_moons":   dict(degree=1, role="deprecated",
+                           note="leaks the label into phi; retained for the existing figure"),
+    "latitude_bands": dict(degree=1, role="baseline",
+                           note="theta alone suffices, by design -- the control"),
+    "tilted_bands":   dict(degree=1, role="primary",
+                           note="needs both coordinates; use tilt near pi/4"),
+    "quadrupole":     dict(degree=2, role="falsification",
+                           note="two polar caps; affine ceiling 0.786"),
+    "sectoral":       dict(degree=2, role="falsification",
+                           note="balanced; affine ceiling 0.669"),
+    "banded_4":       dict(degree=4, role="falsification",
+                           note="alternating latitude bands"),
+    "hyperbolic":     dict(degree=2, role="falsification",
+                           note="sign(x*z); both coordinate marginals at chance"),
+}
+
+# name -> (which coordinate leaks, best accuracy from it alone)
+LEAKY_GENERATORS = {
+    "sphere_moons": ("phi", 1.000),
+}
+
+# A generator leaks when one coordinate alone gets within this margin of the
+# best any degree-1 model could do: the second coordinate then buys nothing.
+LEAKAGE_MARGIN = 0.02
+
+
+def make_target(name, n_samples=400, seed=42, **kw):
+    """Uniform entry point.  Raises on an unknown name rather than KeyError."""
+    if name not in TARGETS:
+        raise ValueError(f"unknown target '{name}'; choose from {sorted(TARGETS)}")
+    return TARGETS[name](n_samples=n_samples, seed=seed, **kw)
+
+
+def require_clean(name):
+    """
+    Guard for any experiment that compares representations.  Call it before
+    generating data; it raises on a dataset that cannot support the claim.
+    """
+    if name in LEAKY_GENERATORS:
+        what, acc = LEAKY_GENERATORS[name]
+        raise ValueError(
+            f"'{name}' leaks the label into {what} ({acc:.3f} from that "
+            f"coordinate alone).  A task solvable by reading one number cannot "
+            f"measure representation quality.  Use 'tilted_bands' (needs both "
+            f"coordinates) or 'latitude_bands' (axis-aligned control).")
+    return name
