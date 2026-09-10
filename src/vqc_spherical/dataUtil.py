@@ -5,7 +5,8 @@ adpoted the water-earth classfication datatset, as another real datasets to expe
 
 import numpy as np
 
-def make_sphere_moons(n_samples=300, noise_std=0.08, seed=42):
+def make_sphere_moons(n_samples=300, noise_std=0.08, seed=42,
+                      latitude_center=np.pi / 3, separation=np.pi / 3):
     """
     Two crescent-shaped classes on the surface of a unit sphere.
     Both theta (latitude) and phi (longitude) determine the class.
@@ -20,6 +21,33 @@ def make_sphere_moons(n_samples=300, noise_std=0.08, seed=42):
     noise_std : float
         Controls Gaussian spread of the latitude band (scaled by pi).
     seed : int
+    latitude_center : float
+        Polar angle of class 0's band centre.  The default pi/3 reproduces the
+        original generator exactly.
+    separation : float
+        Angular gap; class 1 sits at latitude_center + separation.
+
+    DEPRECATED FOR REPRESENTATION WORK -- RETAINED DELIBERATELY
+    ----------------------------------------------------------
+    Class 0 draws phi in (0, pi) and class 1 in (pi, 2pi), so LONGITUDE ALONE
+    SEPARATES THE CLASSES.  Measured on 6000 points:
+
+        phi alone      1.000
+        theta alone    0.983
+        affine ceiling 1.000
+
+    Every model reaches 100%, which is the saturated-benchmark failure mode:
+    nothing about inductive bias can be learned from a task everyone solves by
+    reading one number.
+
+    It is not fixed in place, on purpose.  It is the dataset behind the
+    existing sphere_moons figure, so changing what the name means would make
+    that figure unreproducible; and as a documented negative example it is
+    worth more than it would be deleted.  It is listed in LEAKY_GENERATORS and
+    require_clean() refuses it.
+
+    Use make_latitude_bands (axis-aligned control) or make_tilted_bands (needs
+    both coordinates) instead.
 
     Returns
     -------
@@ -30,10 +58,10 @@ def make_sphere_moons(n_samples=300, noise_std=0.08, seed=42):
     rng = np.random.default_rng(seed)
     n_half = n_samples // 2
 
-    theta_0 = rng.normal(np.pi / 3, noise_std * np.pi, n_half)
+    theta_0 = rng.normal(latitude_center, noise_std * np.pi, n_half)
     phi_0 = rng.uniform(0, np.pi, n_half)
 
-    theta_1 = rng.normal(2 * np.pi / 3, noise_std * np.pi, n_half)
+    theta_1 = rng.normal(latitude_center + separation, noise_std * np.pi, n_half)
     phi_1 = rng.uniform(np.pi, 2 * np.pi, n_half)
 
     theta = np.concatenate([theta_0, theta_1])
