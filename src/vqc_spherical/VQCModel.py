@@ -46,9 +46,11 @@ class VQCModel:
         measurement="expval",
         device_name="default.qubit",
         dropout_rate=0.0,
+        n_uploads=1,
     ):
         
         self.n_qubits = n_qubits
+        self.n_uploads = int(n_uploads)
         self.embedding = embedding or EmbeddingLayer(method="spherical")
         self.ansatz = ansatz or AnsatzLayer()
         self.dropout_rate = dropout_rate
@@ -85,11 +87,34 @@ class VQCModel:
         """Here we define the quantum circuit that will be executed on the quantum device.
         The circuit consists of an embedding layer that encodes the input features into quantum states,
         followed by a variational ansatz that applies parameterized quantum gates to the qubits.
-        Finally, we measure the qubits according to the specified measurement type."""
+        Finally, we measure the qubits according to the specified measurement type.
+
+        With n_uploads = U > 1 the encoding is interleaved with trainable
+        layers -- E(x) A(w_0) E(x) A(w_1) ... -- which is data re-uploading.
+        The weights then have shape (U, L, n_wires, 3) and are kept as ONE
+        array and sliced; a Python list of arrays breaks autograd tracing.
+
+        Re-uploading raises the accessible Fourier frequency in the encoding
+        ANGLES.  That is not the same as raising harmonic degree on the sphere,
+        and the difference is measured in ExperimentLadders.py."""
         wires = range(self.n_qubits)
-        self.embedding.apply(features, wires)
-        self.ansatz.apply(weights, wires)
+        if self.n_uploads == 1:
+            self.embedding.apply(features, wires)
+            self.ansatz.apply(weights, wires)
+        else:
+            for u in range(self.n_uploads):
+                self.embedding.apply(features, wires)
+                self.ansatz.apply(weights[u], wires)
         return self._measure(wires)
+
+    def weight_shape(self):
+        """Weight shape, with the upload axis prepended when n_uploads > 1."""
+        base = tuple(self.ansatz.get_weight_shape(self.n_qubits))
+        return base if self.n_uploads == 1 else (self.n_uploads,) + base
+
+    def n_params(self):
+        """Total number of trainable parameters."""
+        return int(np.prod(self.weight_shape()))
 
     def _measure(self, wires):
         if self.measurement == "expval":
