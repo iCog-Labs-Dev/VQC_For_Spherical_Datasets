@@ -53,6 +53,8 @@ def water_earth_dataset():
     Fetches the water-earth classification dataset from Google Earth Engine.
     The dataset is a binary classification of water vs. land on the Earth's surface."""
 
+    # Remember that you need to authenticate with Google Earth Engine before running this function
+
     ee.Initialize()
     dataset = ee.ImageCollection("JRC/GSW1_4/YearlyHistory")
     return dataset.size().getInfo()
