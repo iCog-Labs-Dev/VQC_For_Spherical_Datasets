@@ -35,10 +35,7 @@ form, the derivation is wrong and no experiment will rescue it.
 import numpy as np
 from scipy.special import factorial, lpmv
 
-try:
-    from . import Kernels as K
-except ImportError:  # pragma: no cover - flat sys.path
-    import Kernels as K
+from . import Kernels as K
 
 
 # ----------------------------------------------------------------------

@@ -2,7 +2,7 @@
 import numpy as np
 import pytest
 
-import Kernels as K
+from vqc_spherical import Kernels as K
 
 
 def _sample(n=400, seed=0):

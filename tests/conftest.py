@@ -1,7 +1,7 @@
-"""Put src/ on sys.path so the package imports without an editable install."""
-import os
-import sys
+"""Put ``src`` on sys.path so tests can import the package from a checkout."""
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.insert(0, os.path.join(ROOT, "src"))
-sys.path.insert(0, os.path.join(ROOT, "src", "vqc_spherical"))
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "src"))

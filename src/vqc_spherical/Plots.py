@@ -16,7 +16,7 @@ These are static figures for a printed report, so they deliberately commit to
 the light surface only.  Sequential encodings use a single blue ramp, light to
 dark -- never a rainbow.
 
-Usage:  python Plots.py [--only datasets|spectrum|harmonic|staircase|contrast|faithfulness|curves]
+Usage:  python -m vqc_spherical.Plots [--only datasets|spectrum|harmonic|staircase|contrast|faithfulness|curves]
 """
 import argparse
 import csv
@@ -28,10 +28,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-try:
-    from . import ExperimentUtils as U
-except ImportError:  # pragma: no cover - flat sys.path
-    import ExperimentUtils as U
+from . import ExperimentUtils as U
 
 SERIES = {"bloch": "#2a78d6", "cartesian": "#eb6834",
           "sincos": "#1baf7a", "raw": "#4a3aa7"}
@@ -91,10 +88,7 @@ def fig_datasets():
     Every dataset drawn on the sphere it lives on, the deprecated leaking one
     first so the flaw is visible beside its replacements.
     """
-    try:
-        from . import dataUtil as D
-    except ImportError:
-        import dataUtil as D
+    from . import dataUtil as D
 
     order = ["sphere_moons", "latitude_bands", "tilted_bands",
              "quadrupole", "sectoral", "hyperbolic"]
@@ -135,10 +129,7 @@ def fig_datasets():
 
 def fig_spectrum():
     """Rank-4 spectrum on a log axis.  The cliff after four is the point."""
-    try:
-        from . import Analysis as A, Kernels as K
-    except ImportError:
-        import Analysis as A, Kernels as K
+    from . import Analysis as A, Kernels as K
     theta, phi = A.sample_sphere(600, seed=1)
     n = len(theta)
     ev = np.maximum(K.gram_spectrum(theta, phi, K.bloch_kernel) / n, 1e-18)

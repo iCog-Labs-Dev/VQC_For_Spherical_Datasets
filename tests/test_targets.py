@@ -2,8 +2,9 @@
 import numpy as np
 import pytest
 
-import Analysis as A
-import dataUtil as D
+from vqc_spherical import Analysis as A
+from vqc_spherical import Kernels as K
+from vqc_spherical import dataUtil as D
 
 
 def test_sphere_moons_leaks_the_label_into_longitude():
@@ -66,7 +67,6 @@ def test_tilt_extremes_move_the_leak_rather_than_removing_it():
 
 
 def test_rotation_preserves_every_geodesic_distance():
-    import Kernels as K
     theta, phi, _ = D.make_latitude_bands(200, seed=2)
     t2, p2 = D.rotate_dataset(theta, phi, D.random_rotation(4))
     g1 = K.geodesic_angle(theta[:, None], phi[:, None], theta[None, :], phi[None, :])

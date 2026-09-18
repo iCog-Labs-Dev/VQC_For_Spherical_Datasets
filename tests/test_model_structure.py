@@ -13,10 +13,10 @@ here can be blamed on an optimisation failure.
 import numpy as np
 import pytest
 
-import Analysis as A
-from AnsatzLayer import AnsatzLayer
-from EmbeddingLayer import EmbeddingLayer
-from VQCModel import VQCModel
+from vqc_spherical import Analysis as A
+from vqc_spherical.AnsatzLayer import AnsatzLayer
+from vqc_spherical.EmbeddingLayer import EmbeddingLayer
+from vqc_spherical.VQCModel import VQCModel
 
 THETA, PHI = A.sample_sphere(2000, seed=17)
 
@@ -86,7 +86,7 @@ def test_affine_ceiling_recovers_a_known_cap():
     Guards the search itself.
     """
     theta, phi = A.sample_sphere(4000, seed=23)
-    import Kernels as K
+    from vqc_spherical import Kernels as K
     y = (K.to_cartesian(theta, phi) @ np.array([0.0, 0.0, 1.0]) > 0.3).astype(float)
     res = A.affine_ceiling(theta, phi, y, n_directions=8192)
     assert res["accuracy"] > 0.99
@@ -105,7 +105,7 @@ def test_affine_ceiling_is_a_grid_limited_lower_bound():
     falsification.  This test documents the convergence rather than hiding it.
     """
     theta, phi = A.sample_sphere(4000, seed=23)
-    import Kernels as K
+    from vqc_spherical import Kernels as K
     y = (K.to_cartesian(theta, phi) @ np.array([0.0, 0.0, 1.0]) > 0.3).astype(float)
     coarse = A.affine_ceiling(theta, phi, y, n_directions=256)["accuracy"]
     fine = A.affine_ceiling(theta, phi, y, n_directions=8192)["accuracy"]

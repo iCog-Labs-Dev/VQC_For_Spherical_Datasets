@@ -1,12 +1,12 @@
 """
 Phase driver.
 
-    python RunAll.py --phase 0     dataset gate, ceilings, circuit structure
-    python RunAll.py --phase 1     kernel spectra and the falsification runs
-    python RunAll.py --phase 2     both expansion ladders
-    python RunAll.py --phase 3     faithfulness and sample efficiency
-    python RunAll.py --figures     redraw every figure from results/*.csv
-    python RunAll.py --all --quick smoke-test the whole pipeline
+    python -m vqc_spherical.RunAll --phase 0
+    python -m vqc_spherical.RunAll --phase 1
+    python -m vqc_spherical.RunAll --phase 2
+    python -m vqc_spherical.RunAll --phase 3
+    python -m vqc_spherical.RunAll --figures
+    python -m vqc_spherical.RunAll --all --quick
 
 Order matters.  Phase 0 begins with ValidateDatasets.py, which refuses to let a
 dataset into the pipeline unless it does what its declared role requires; that
@@ -25,27 +25,28 @@ import subprocess
 import sys
 
 PHASES = {
-    "0": ["ValidateDatasets.py", "ExperimentAnalyticCore.py"],
-    "1": ["ExperimentKernelSpectrum.py", "ExperimentFalsification.py"],
-    "2": ["ExperimentLadders.py"],
-    "3": ["ExperimentFaithfulness.py"],
+    "0": ["ValidateDatasets", "ExperimentAnalyticCore"],
+    "1": ["ExperimentKernelSpectrum", "ExperimentFalsification"],
+    "2": ["ExperimentLadders"],
+    "3": ["ExperimentFaithfulness"],
 }
 
 # Stages that involve no training run at full scale regardless of --quick:
 # they take seconds and carry most of the analytic content.
-NO_QUICK = ("ValidateDatasets.py", "ExperimentAnalyticCore.py",
-            "ExperimentKernelSpectrum.py")
+NO_QUICK = ("ValidateDatasets", "ExperimentAnalyticCore",
+            "ExperimentKernelSpectrum")
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+ROOT = os.path.dirname(os.path.dirname(HERE))
 
 
-def run(script, quick, extra=()):
-    cmd = [sys.executable, os.path.join(HERE, script)]
-    if quick and script not in NO_QUICK:
+def run(module, quick, extra=()):
+    cmd = [sys.executable, "-m", f"vqc_spherical.{module}"]
+    if quick and module not in NO_QUICK:
         cmd.append("--quick")
     cmd += list(extra)
-    print(f"\n{'=' * 70}\n  {' '.join(os.path.basename(c) for c in cmd)}\n{'=' * 70}")
-    return subprocess.call(cmd, cwd=HERE)
+    print(f"\n{'=' * 70}\n  {' '.join(cmd)}\n{'=' * 70}")
+    return subprocess.call(cmd, cwd=ROOT)
 
 
 def main():
@@ -72,7 +73,9 @@ def main():
             return code
 
     if a.figures or a.all:
-        subprocess.call([sys.executable, os.path.join(HERE, "Plots.py")], cwd=HERE)
+        subprocess.call(
+            [sys.executable, "-m", "vqc_spherical.Plots"], cwd=ROOT
+        )
     return 0
 
 

@@ -3,6 +3,7 @@
 # Nothing here trains a model; expect a few minutes total.
 
 $ErrorActionPreference = "Continue"
+$env:PYTHONPATH = Join-Path $PSScriptRoot "src"
 
 # Prefer the repo's virtualenv if it exists, else whatever python is on PATH.
 $py = ".\.venv\Scripts\python.exe"
@@ -19,12 +20,10 @@ Write-Host "`n=== 2. test suite (expect 64 passed) ===" -ForegroundColor Cyan
 & $py -m pytest tests -q
 
 Write-Host "`n=== 3. dataset gate + analytic core (no training) ===" -ForegroundColor Cyan
-Push-Location src\vqc_spherical
-& $py RunAll.py --phase 0
+& $py -m vqc_spherical.RunAll --phase 0
 
 Write-Host "`n=== 4. kernel spectrum (no training) ===" -ForegroundColor Cyan
-& $py ExperimentKernelSpectrum.py
-Pop-Location
+& $py -m vqc_spherical.ExperimentKernelSpectrum
 
 Write-Host "`n=== what to check above ===" -ForegroundColor Yellow
 Write-Host "  tests            : 64 passed"
@@ -35,6 +34,5 @@ Write-Host "  Gram rank        : 4, eigenvalues/n ~ 0.500, 0.176, 0.162, 0.161"
 Write-Host "  spin ladder rank : 4, 9, 16, 25 for n = 1..4"
 Write-Host ""
 Write-Host "Next, the decisive one (~30 min, 10 seeds, three rotation axes):" -ForegroundColor Yellow
-Write-Host "  cd src\vqc_spherical"
-Write-Host "  $py ExperimentFaithfulness.py"
+Write-Host "  $py -m vqc_spherical.ExperimentFaithfulness"
 Write-Host ""

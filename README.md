@@ -24,13 +24,13 @@ That is reported as a finding and appears in every comparison table.
 
 ```bash
 pip install -r requirements.txt
+pip install -e . --no-deps
 
-cd src/vqc_spherical
-python RunAll.py --phase 0     # dataset gate, ceilings, circuit structure
-python RunAll.py --phase 1     # kernel spectra, falsification
-python RunAll.py --phase 2     # both expansion ladders
-python RunAll.py --phase 3     # faithfulness, sample efficiency
-python RunAll.py --figures     # redraw figures from results/*.csv
+python -m vqc_spherical.RunAll --phase 0  # dataset gate and analytic core
+python -m vqc_spherical.RunAll --phase 1  # spectra and falsification
+python -m vqc_spherical.RunAll --phase 2  # both expansion ladders
+python -m vqc_spherical.RunAll --phase 3  # faithfulness and sample efficiency
+python -m vqc_spherical.RunAll --figures  # redraw figures from results/*.csv
 
 python -m pytest tests -q      # from the repository root
 ```

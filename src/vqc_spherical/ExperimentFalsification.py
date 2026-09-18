@@ -21,17 +21,14 @@ sin(theta) < sqrt(2/3).  The torus representation is NOT degree-limited: it is
 strictly more expressive than the circuit here while being less faithful.  That
 is the honest story -- the encoding buys a prior, not power.
 
-Usage:  python ExperimentFalsification.py [--quick]
+Usage:  python -m vqc_spherical.ExperimentFalsification [--quick]
 """
 import argparse
 import warnings
 
 import numpy as np
 
-try:
-    from . import ClassicalBaselines as B, Config as C, dataUtil as D, ExperimentUtils as U
-except ImportError:  # pragma: no cover - flat sys.path
-    import ClassicalBaselines as B, Config as C, dataUtil as D, ExperimentUtils as U
+from . import ClassicalBaselines as B, Config as C, dataUtil as D, ExperimentUtils as U
 
 warnings.filterwarnings("ignore")
 

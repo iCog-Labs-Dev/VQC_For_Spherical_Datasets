@@ -12,20 +12,14 @@ This is the gate on everything downstream: if the affine residual or the
 spectrum disagrees with the closed forms, the derivation is wrong and no amount
 of training will rescue it.
 
-Usage:  python ExperimentAnalyticCore.py
+Usage:  python -m vqc_spherical.ExperimentAnalyticCore
 """
 import numpy as np
 
-try:
-    from . import Analysis as A, Config as C, dataUtil as D, ExperimentUtils as U
-    from .AnsatzLayer import AnsatzLayer
-    from .EmbeddingLayer import EmbeddingLayer
-    from .VQCModel import VQCModel
-except ImportError:  # pragma: no cover - flat sys.path
-    import Analysis as A, Config as C, dataUtil as D, ExperimentUtils as U
-    from AnsatzLayer import AnsatzLayer
-    from EmbeddingLayer import EmbeddingLayer
-    from VQCModel import VQCModel
+from . import Analysis as A, Config as C, dataUtil as D, ExperimentUtils as U
+from .AnsatzLayer import AnsatzLayer
+from .EmbeddingLayer import EmbeddingLayer
+from .VQCModel import VQCModel
 
 SPECS = [("latitude_bands", 1), ("sphere_moons", 1), ("tilted_bands", 1),
          ("quadrupole", 2), ("sectoral", 2), ("banded_4", 4), ("hyperbolic", 2)]

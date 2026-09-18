@@ -9,14 +9,11 @@ not "3 : 1".  They sum to the trace, which is n because k(0) = 1.
 Also runs the spin ladder, where the rank must be (n + 1)^2, and the two
 unfaithful controls for contrast.
 
-Usage:  python ExperimentKernelSpectrum.py
+Usage:  python -m vqc_spherical.ExperimentKernelSpectrum
 """
 import numpy as np
 
-try:
-    from . import Analysis as A, Config as C, ExperimentUtils as U, Kernels as K
-except ImportError:  # pragma: no cover - flat sys.path
-    import Analysis as A, Config as C, ExperimentUtils as U, Kernels as K
+from . import Analysis as A, Config as C, ExperimentUtils as U, Kernels as K
 
 
 def main(n_points=600, seed=1):

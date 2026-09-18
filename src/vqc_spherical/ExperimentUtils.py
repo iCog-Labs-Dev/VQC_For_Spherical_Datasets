@@ -7,10 +7,7 @@ import time
 import numpy as np
 from sklearn.model_selection import train_test_split
 
-try:
-    from . import Config as C
-except ImportError:  # pragma: no cover - flat sys.path
-    import Config as C
+from . import Config as C
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -92,16 +89,10 @@ def train_vqc(train, test, n_qubits=2, n_layers=C.DEPTH_DEFAULT, n_uploads=1,
     """
     from pennylane import numpy as pnp
 
-    try:
-        from .AnsatzLayer import AnsatzLayer
-        from .EmbeddingLayer import EmbeddingLayer
-        from .VQCModel import VQCModel
-        from .VQCOptimizer import Trainer
-    except ImportError:  # pragma: no cover - flat sys.path
-        from AnsatzLayer import AnsatzLayer
-        from EmbeddingLayer import EmbeddingLayer
-        from VQCModel import VQCModel
-        from VQCOptimizer import Trainer
+    from .AnsatzLayer import AnsatzLayer
+    from .EmbeddingLayer import EmbeddingLayer
+    from .VQCModel import VQCModel
+    from .VQCOptimizer import Trainer
 
     (th_tr, ph_tr, y_tr), (th_te, ph_te, y_te) = train, test
     model = VQCModel(n_qubits=n_qubits,

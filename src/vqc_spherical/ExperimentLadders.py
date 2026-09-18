@@ -26,7 +26,7 @@ arms: fixed L (parameters grow with the rung) and U * L held constant
 parameter-count effect, not an expressivity threshold, so it must appear in
 both.
 
-Usage:  python ExperimentLadders.py [--quick] [--no-training]
+Usage:  python -m vqc_spherical.ExperimentLadders [--quick] [--no-training]
 """
 import argparse
 import csv
@@ -35,16 +35,10 @@ import warnings
 
 import numpy as np
 
-try:
-    from . import Analysis as A, Config as C, dataUtil as D, ExperimentUtils as U, Kernels as K
-    from .AnsatzLayer import AnsatzLayer
-    from .EmbeddingLayer import EmbeddingLayer
-    from .VQCModel import VQCModel
-except ImportError:  # pragma: no cover - flat sys.path
-    import Analysis as A, Config as C, dataUtil as D, ExperimentUtils as U, Kernels as K
-    from AnsatzLayer import AnsatzLayer
-    from EmbeddingLayer import EmbeddingLayer
-    from VQCModel import VQCModel
+from . import Analysis as A, Config as C, dataUtil as D, ExperimentUtils as U, Kernels as K
+from .AnsatzLayer import AnsatzLayer
+from .EmbeddingLayer import EmbeddingLayer
+from .VQCModel import VQCModel
 
 warnings.filterwarnings("ignore")
 

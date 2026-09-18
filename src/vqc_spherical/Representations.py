@@ -28,10 +28,7 @@ encoding, not in the coordinates.
 
 import numpy as np
 
-try:
-    from . import dataUtil as D
-except ImportError:  # pragma: no cover - flat sys.path
-    import dataUtil as D
+from . import dataUtil as D
 
 CLASSICAL = ("raw", "sincos", "cartesian")
 QUANTUM = ("bloch",)

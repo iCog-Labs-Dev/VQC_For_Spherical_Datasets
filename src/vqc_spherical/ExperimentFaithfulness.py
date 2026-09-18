@@ -27,17 +27,14 @@ architecture, optimiser, epoch budget and seed.
 The train/test gap is reported beside accuracy: a representation that can fit
 structure the data does not contain overfits before it misclassifies.
 
-Usage:  python ExperimentFaithfulness.py [--quick] [--axis tilt|polar|haar]
+Usage:  python -m vqc_spherical.ExperimentFaithfulness [--quick] [--axis tilt|polar|haar]
 """
 import argparse
 import warnings
 
 import numpy as np
 
-try:
-    from . import ClassicalBaselines as B, Config as C, dataUtil as D, ExperimentUtils as U
-except ImportError:  # pragma: no cover - flat sys.path
-    import ClassicalBaselines as B, Config as C, dataUtil as D, ExperimentUtils as U
+from . import ClassicalBaselines as B, Config as C, dataUtil as D, ExperimentUtils as U
 
 warnings.filterwarnings("ignore")
 

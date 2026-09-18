@@ -20,10 +20,7 @@ import numpy as np
 from sklearn.linear_model import LogisticRegression
 from sklearn.neural_network import MLPClassifier
 
-try:
-    from . import Analysis as A, Config as C, Kernels as K, Representations as R
-except ImportError:  # pragma: no cover - flat sys.path
-    import Analysis as A, Config as C, Kernels as K, Representations as R
+from . import Analysis as A, Config as C, Kernels as K, Representations as R
 
 
 class BestAffine:

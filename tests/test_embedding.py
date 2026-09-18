@@ -16,8 +16,8 @@ import numpy as np
 import pennylane as qml
 import pytest
 
-import Kernels as K
-from EmbeddingLayer import EmbeddingLayer
+from vqc_spherical import Kernels as K
+from vqc_spherical.EmbeddingLayer import EmbeddingLayer
 
 POINTS = [(0.7, 1.2), (2.3, 5.1), (np.pi / 2, 0.0), (1.0, 2 * np.pi - 0.01)]
 

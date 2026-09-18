@@ -32,14 +32,11 @@ relative to what the dataset is supposed to do.
 A generator failing the test for its own role fails the run with a non-zero
 exit code, so a newly written dataset cannot quietly enter the pipeline broken.
 
-Usage:  python ValidateDatasets.py [--n 20000] [--directions 4096]
+Usage:  python -m vqc_spherical.ValidateDatasets [--n 20000] [--directions 4096]
 """
 import argparse
 
-try:
-    from . import Analysis as A, dataUtil as D, ExperimentUtils as U
-except ImportError:  # pragma: no cover - flat sys.path
-    import Analysis as A, dataUtil as D, ExperimentUtils as U
+from . import Analysis as A, dataUtil as D, ExperimentUtils as U
 
 # A "solvable" task must be within reach of a degree-1 model; a falsification
 # target must not be.  The gap is deliberately wide, so a dataset sitting
