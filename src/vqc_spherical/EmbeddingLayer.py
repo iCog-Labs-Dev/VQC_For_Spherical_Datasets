@@ -1,19 +1,15 @@
 import pennylane as qml
-import math
-import numpy as np
-
 
 
 class EmbeddingLayer:
-
     """
-    manifold-preserving encoding of classical data into quantum states.
+    Manifold-preserving encoding of classical data into quantum states.
 
     Supported method
     -----------------
     spherical  : Maps paired (theta, phi) coordinates onto the Bloch sphere
                  using RY(theta) then RZ(phi) per qubit.  Preserves the
-                 wrap-around manifold so it aviod seam and torsion.
+                 wrap-around manifold without introducing a coordinate seam.
     broadcast  : Applies the SAME (theta, phi) to every wire, giving the
                  spin-n/2 coherent state |q>^{tensor n}.  Its kernel is
                  cos^{2n}(gamma/2): faithful for every n, with the Legendre
@@ -28,16 +24,15 @@ class EmbeddingLayer:
     so the correct circuit is RY(theta) then RZ(phi).  Do not reorder these.
     """
 
-    SUPPORTED_METHOD = ["spherical", "broadcast"]
+    SUPPORTED_METHODS = ("spherical", "broadcast")
 
-    def __init__(self, method="spherical", rotation="Y"):
+    def __init__(self, method="spherical"):
         self.method = str(method).lower()
-        self.rotation = rotation
 
-        if self.method not in EmbeddingLayer.SUPPORTED_METHOD:
+        if self.method not in self.SUPPORTED_METHODS:
             raise ValueError(
                 f"Unsupported embedding method: '{method}'. "
-                f"Choose from {EmbeddingLayer.SUPPORTED_METHOD}"
+                f"Choose from {self.SUPPORTED_METHODS}"
             )
 
     def apply(self, features, wires):
@@ -47,7 +42,6 @@ class EmbeddingLayer:
             self._apply_spherical_broadcast(features, wires)
         else:
             self._apply_spherical(features, wires)
-   
 
     @staticmethod
     def _apply_spherical(features, wires):
@@ -56,14 +50,20 @@ class EmbeddingLayer:
         Each consecutive (theta, phi) pair is mapped to one qubit via RY then RZ,
         placing the data point on the corresponding location of the Bloch sphere.
         """
+        if len(features) % 2:
+            raise ValueError("spherical embedding requires theta/phi pairs")
+
         n_pairs = len(features) // 2
+        if n_pairs > len(wires):
+            raise ValueError(
+                f"embedding received {n_pairs} coordinate pairs for "
+                f"{len(wires)} wires"
+            )
         for i in range(n_pairs):
             theta = features[2 * i]
             phi = features[2 * i + 1]
             qml.RY(theta, wires=wires[i])
             qml.RZ(phi, wires=wires[i])
-
-
 
     @staticmethod
     def _apply_spherical_broadcast(features, wires):
@@ -75,24 +75,19 @@ class EmbeddingLayer:
         of the geodesic angle alone, with Legendre coefficients terminating at
         ell = n and lambda_ell = (n!)^2 / [(n-ell)! (n+ell+1)!].
         """
-        theta, phi = features[0], features[1]
+        if len(features) != 2:
+            raise ValueError("broadcast embedding requires one theta/phi pair")
+        theta, phi = features
         for w in wires:
             qml.RY(theta, wires=w)
             qml.RZ(phi, wires=w)
 
     def get_required_qubits(self, num_features):
         """Calculate how many qubits are needed for the given feature count."""
-
         if self.method == "broadcast":
-            return 1          # any n >= 1 is valid; n sets ell_max
-        if self.method == "spherical":
-            return num_features // 2
-        
-
-    @staticmethod
-    def _maybe_pad(features, target_length):
-        """Pad a feature vector with zeros to reach *target_length*."""
-        if hasattr(features, "__len__") and len(features) >= target_length:
-            return features
-        pad_width = target_length - len(features)
-        return np.pad(features, (0, pad_width), mode="constant")
+            if num_features != 2:
+                raise ValueError("broadcast embedding requires exactly 2 features")
+            return 1  # any n >= 1 is valid; n sets ell_max
+        if num_features < 2 or num_features % 2:
+            raise ValueError("spherical embedding requires theta/phi pairs")
+        return num_features // 2

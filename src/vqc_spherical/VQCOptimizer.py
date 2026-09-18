@@ -21,15 +21,19 @@ class Trainer:
     """
 
     _OPTIMIZERS = {
-    "adam": qml.AdamOptimizer,
-    "gd": qml.GradientDescentOptimizer,
-    "nesterov": qml.NesterovMomentumOptimizer,
-    "spsa": qml.SPSAOptimizer,
-}
+        "adam": qml.AdamOptimizer,
+        "gd": qml.GradientDescentOptimizer,
+        "nesterov": qml.NesterovMomentumOptimizer,
+        "spsa": qml.SPSAOptimizer,
+    }
 
     def __init__(self, model, optimizer_type="adam", stepsize=0.1, batch_size=None):
         self.model = model
         self.batch_size = batch_size
+        if batch_size is not None and batch_size < 1:
+            raise ValueError("batch_size must be a positive integer or None")
+        if stepsize <= 0:
+            raise ValueError("stepsize must be positive")
 
         key = optimizer_type.lower()
         if key not in Trainer._OPTIMIZERS:
@@ -37,8 +41,7 @@ class Trainer:
                 f"Unsupported optimizer: '{optimizer_type}'. "
                 f"Choose from {list(Trainer._OPTIMIZERS)}"
             )
-        self.opt = Trainer._OPTIMIZERS[key](stepsize=stepsize)
-
+        self.opt = self._OPTIMIZERS[key](stepsize=stepsize)
 
     def cost_function(self, weights, X, Y):
         """Binary cross-entropy on rescaled VQC output.
@@ -70,13 +73,10 @@ class Trainer:
         NotImplemented.  X is non-trainable data, so slicing it is safe; the
         circuit output is not.
         """
-        try:
-            if getattr(X, "ndim", 0) == 2 and X.shape[1] == 2:
-                out = self.model.forward([X[:, 0], X[:, 1]], weights)
-                if getattr(out, "shape", None) == (X.shape[0],):
-                    return out
-        except Exception:
-            pass
+        if getattr(X, "ndim", 0) == 2 and X.shape[1] == 2:
+            out = self.model.forward([X[:, 0], X[:, 1]], weights)
+            if getattr(out, "shape", None) == (X.shape[0],):
+                return out
         return np.array([self.model.forward(x, weights) for x in X])
 
     def fit(

@@ -214,12 +214,9 @@ def probe_model(model, weights, theta, phi):
     model.eval()
     theta = np.asarray(theta, dtype=float)
     phi = np.asarray(phi, dtype=float)
-    try:
-        out = np.asarray(model.forward([theta, phi], weights), dtype=float)
-        if out.shape == theta.shape:
-            return out
-    except Exception:
-        pass
+    out = np.asarray(model.forward([theta, phi], weights), dtype=float)
+    if out.shape == theta.shape:
+        return out
     return np.array([float(model.forward(np.array([t, p]), weights))
                      for t, p in zip(theta, phi)])
 
