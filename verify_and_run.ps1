@@ -16,7 +16,7 @@ Write-Host "`n=== 1. branch state (expect 33 new commits, newest first) ===" -Fo
 git log --oneline -5
 git status --short --branch
 
-Write-Host "`n=== 2. test suite (expect 64 passed) ===" -ForegroundColor Cyan
+Write-Host "`n=== 2. test suite (expect 65 passed) ===" -ForegroundColor Cyan
 & $py -m pytest tests -q
 
 Write-Host "`n=== 3. dataset gate + analytic core (no training) ===" -ForegroundColor Cyan
@@ -26,7 +26,7 @@ Write-Host "`n=== 4. kernel spectrum (no training) ===" -ForegroundColor Cyan
 & $py -m vqc_spherical.ExperimentKernelSpectrum
 
 Write-Host "`n=== what to check above ===" -ForegroundColor Yellow
-Write-Host "  tests            : 64 passed"
+Write-Host "  tests            : 65 passed"
 Write-Host "  dataset gate     : 'Every generator satisfies the test for its declared role.'"
 Write-Host "  quadrupole ceil  : ~0.784   (majority baseline ~0.575)"
 Write-Host "  affine residuals : ~1e-15 at every depth and both qubit counts"

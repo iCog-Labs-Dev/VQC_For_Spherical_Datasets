@@ -35,7 +35,7 @@ import warnings
 
 import numpy as np
 
-from . import Analysis as A, Config as C, dataUtil as D, ExperimentUtils as U, Kernels as K
+from . import Analysis as A, Config as C, datasets as D, ExperimentUtils as U, Kernels as K
 from .AnsatzLayer import AnsatzLayer
 from .EmbeddingLayer import EmbeddingLayer
 from .VQCModel import VQCModel

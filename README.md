@@ -48,7 +48,7 @@ never draw, and `Plots.py` never computes.
 | `AnsatzLayer.py`, `VQCModel.py`, `VQCOptimizer.py` | circuit, training loop, data re-uploading |
 | `Kernels.py` | every kernel in closed form, Gram spectra, analytic references |
 | `Analysis.py` | affine ceiling, harmonic projection, coordinate leakage |
-| `dataUtil.py` | datasets, rigid rotations, the target registry |
+| `datasets.py` | datasets, rigid rotations, and the target registry |
 | `ClassicalBaselines.py` | five controls, including the computed ceiling as a model |
 | `ValidateDatasets.py` | the dataset gate -- run it before trusting a dataset |
 | `Experiment*.py`, `RunAll.py` | the four stages and the phase driver |

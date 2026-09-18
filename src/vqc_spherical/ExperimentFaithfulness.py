@@ -34,7 +34,7 @@ import warnings
 
 import numpy as np
 
-from . import ClassicalBaselines as B, Config as C, dataUtil as D, ExperimentUtils as U
+from . import ClassicalBaselines as B, Config as C, datasets as D, ExperimentUtils as U
 
 warnings.filterwarnings("ignore")
 

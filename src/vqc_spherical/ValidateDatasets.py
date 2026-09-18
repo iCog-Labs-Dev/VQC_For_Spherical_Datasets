@@ -36,7 +36,7 @@ Usage:  python -m vqc_spherical.ValidateDatasets [--n 20000] [--directions 4096]
 """
 import argparse
 
-from . import Analysis as A, dataUtil as D, ExperimentUtils as U
+from . import Analysis as A, datasets as D, ExperimentUtils as U
 
 # A "solvable" task must be within reach of a degree-1 model; a falsification
 # target must not be.  The gap is deliberately wide, so a dataset sitting
@@ -104,7 +104,7 @@ def validate(n_samples=20000, n_directions=2048, seed=99):
     if failures:
         print(f"\nFAILED: {', '.join(failures)} do not satisfy the test for their "
               f"declared role.  Fix the generator, or change its role in "
-              f"dataUtil.TARGET_META if the role was wrong.")
+              f"datasets.TARGET_META if the role was wrong.")
     else:
         print("\nEvery generator satisfies the test for its declared role.")
     return rows, failures

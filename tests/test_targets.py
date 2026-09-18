@@ -4,7 +4,7 @@ import pytest
 
 from vqc_spherical import Analysis as A
 from vqc_spherical import Kernels as K
-from vqc_spherical import dataUtil as D
+from vqc_spherical import datasets as D
 
 
 def test_sphere_moons_leaks_the_label_into_longitude():
@@ -99,6 +99,12 @@ def test_every_target_has_the_same_signature():
         assert set(np.unique(y)) <= {0.0, 1.0}
         assert np.all((theta >= 0) & (theta <= np.pi))
         assert np.all((phi >= 0) & (phi < 2 * np.pi + 1e-9))
+
+
+def test_every_target_honours_an_odd_sample_count():
+    for name in D.TARGETS:
+        theta, phi, y = D.make_target(name, n_samples=201, seed=7)
+        assert len(theta) == len(phi) == len(y) == 201
 
 
 def test_every_target_is_documented():

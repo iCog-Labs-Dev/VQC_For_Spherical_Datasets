@@ -16,7 +16,7 @@ Usage:  python -m vqc_spherical.ExperimentAnalyticCore
 """
 import numpy as np
 
-from . import Analysis as A, Config as C, dataUtil as D, ExperimentUtils as U
+from . import Analysis as A, Config as C, datasets as D, ExperimentUtils as U
 from .AnsatzLayer import AnsatzLayer
 from .EmbeddingLayer import EmbeddingLayer
 from .VQCModel import VQCModel

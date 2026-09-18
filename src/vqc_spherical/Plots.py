@@ -88,7 +88,7 @@ def fig_datasets():
     Every dataset drawn on the sphere it lives on, the deprecated leaking one
     first so the flaw is visible beside its replacements.
     """
-    from . import dataUtil as D
+    from . import datasets as D
 
     order = ["sphere_moons", "latitude_bands", "tilted_bands",
              "quadrupole", "sectoral", "hyperbolic"]

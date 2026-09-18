@@ -1,7 +1,4 @@
-"""
-Data preparation and cleaning for spherical datasets. we generate sphere_moons datasets on the surface of the unit sphere, and 
-adpoted the water-earth classfication datatset, as another real datasets to experiments with.
-"""
+"""Spherical dataset generators, coordinate transforms, and target metadata."""
 
 import numpy as np
 
@@ -56,17 +53,20 @@ def make_sphere_moons(n_samples=300, noise_std=0.08, seed=42,
     labels : ndarray (n_samples,)   -- 0 or 1.
     """
     rng = np.random.default_rng(seed)
-    n_half = n_samples // 2
+    n_class_0 = n_samples // 2
+    n_class_1 = n_samples - n_class_0
 
-    theta_0 = rng.normal(latitude_center, noise_std * np.pi, n_half)
-    phi_0 = rng.uniform(0, np.pi, n_half)
+    theta_0 = rng.normal(latitude_center, noise_std * np.pi, n_class_0)
+    phi_0 = rng.uniform(0, np.pi, n_class_0)
 
-    theta_1 = rng.normal(latitude_center + separation, noise_std * np.pi, n_half)
-    phi_1 = rng.uniform(np.pi, 2 * np.pi, n_half)
+    theta_1 = rng.normal(
+        latitude_center + separation, noise_std * np.pi, n_class_1
+    )
+    phi_1 = rng.uniform(np.pi, 2 * np.pi, n_class_1)
 
     theta = np.concatenate([theta_0, theta_1])
     phi = np.concatenate([phi_0, phi_1])
-    labels = np.array([0.0] * n_half + [1.0] * n_half)
+    labels = np.concatenate([np.zeros(n_class_0), np.ones(n_class_1)])
 
     theta = np.clip(theta, 0, np.pi)
     phi = phi % (2 * np.pi)
@@ -97,10 +97,6 @@ def sphere_to_cartesian(theta, phi):
     y = np.sin(theta) * np.sin(phi)
     z = np.cos(theta)
     return np.column_stack([x, y, z])
-
-
-if __name__ == "__main__":
-    print(water_earth_dataset())
 
 
 # ======================================================================

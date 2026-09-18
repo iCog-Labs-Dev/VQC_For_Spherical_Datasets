@@ -28,7 +28,7 @@ encoding, not in the coordinates.
 
 import numpy as np
 
-from . import dataUtil as D
+from . import datasets as D
 
 CLASSICAL = ("raw", "sincos", "cartesian")
 QUANTUM = ("bloch",)
