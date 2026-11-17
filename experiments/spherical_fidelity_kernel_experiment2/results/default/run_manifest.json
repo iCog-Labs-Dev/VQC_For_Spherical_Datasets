@@ -1,0 +1,147 @@
+{
+  "config": {
+    "name": "default",
+    "copy_counts": [
+      1,
+      2,
+      4,
+      8
+    ],
+    "shots_per_evaluation": [
+      100,
+      500,
+      1000,
+      5000
+    ],
+    "train_sizes": [
+      32,
+      64,
+      128,
+      256
+    ],
+    "n_val": 100,
+    "n_test": 300,
+    "targets": [
+      {
+        "name": "Y_1_0",
+        "terms": [
+          [
+            1,
+            0,
+            1.0
+          ]
+        ]
+      },
+      {
+        "name": "Y_2_0",
+        "terms": [
+          [
+            2,
+            0,
+            1.0
+          ]
+        ]
+      },
+      {
+        "name": "Y_3_2",
+        "terms": [
+          [
+            3,
+            2,
+            1.0
+          ]
+        ]
+      },
+      {
+        "name": "Y_4_1",
+        "terms": [
+          [
+            4,
+            1,
+            1.0
+          ]
+        ]
+      },
+      {
+        "name": "mixed",
+        "terms": [
+          [
+            1,
+            0,
+            0.5
+          ],
+          [
+            2,
+            1,
+            0.3
+          ],
+          [
+            3,
+            -2,
+            0.2
+          ]
+        ]
+      }
+    ],
+    "conditions": [
+      "exact_exact",
+      "sampled_exact",
+      "exact_sampled",
+      "sampled_sampled"
+    ],
+    "data_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "shot_seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "ridge_lambdas": [
+      1e-08,
+      1e-07,
+      1e-06,
+      1e-05,
+      0.0001,
+      0.001,
+      0.01,
+      0.1,
+      1.0
+    ],
+    "ridge_convention": "(K + lambda*I) alpha = y",
+    "harmonic_max_degree": 6,
+    "measurement_backend": "bernoulli_reference",
+    "budget_mode": "per_evaluation",
+    "total_budgets": [],
+    "allocations": [
+      "uniform"
+    ]
+  },
+  "measurement_backend": "bernoulli_reference",
+  "budget_mode": "per_evaluation",
+  "versions": {
+    "python": "3.11.9",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "pandas": "3.0.5"
+  },
+  "commit": null,
+  "timestamp_utc": "2026-11-07T14:53:16+00:00",
+  "command": "run_experiment.py",
+  "planned_contexts": 80,
+  "planned_rows": 48400,
+  "elapsed_seconds": 111.28,
+  "rows_written": 48400,
+  "diagnostic_rows_written": 3200
+}
